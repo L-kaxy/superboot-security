@@ -114,7 +114,6 @@ public class ShiroHelper implements ApplicationContextAware {
 			HttpServletRequest http = (HttpServletRequest) request;
 			toUseRequest = new ShiroHttpServletRequest(http, request.getServletContext(),
 					securityManager.isHttpSessionMode());
-			http.getSession().setMaxInactiveInterval(30);
 		}
 		ServletResponse toUseResponse = response;
 		if (!securityManager.isHttpSessionMode() && (request instanceof ShiroHttpServletRequest)

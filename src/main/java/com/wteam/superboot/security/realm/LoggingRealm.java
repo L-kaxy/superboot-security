@@ -6,7 +6,6 @@ package com.wteam.superboot.security.realm;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -77,26 +76,13 @@ public class LoggingRealm extends AuthorizingRealm {
 		String loginmsg = (String) token.getPrincipal(); // 得到登录信息
 		String password = new String((char[]) token.getCredentials()); // 得到登录凭证
 
-		Boolean hasAccount = false;
-		Boolean auth = false;
 		UserkeyPo userkey = new UserkeyPo();
 
 		userkey.setLoginmsg(loginmsg);
-		if (userkeyRepository.queryNonDeleteNonLockupCount(userkey) > 0) {
-			hasAccount = true;
-			userkey.setCredential(password);
-			if (userkeyRepository.queryNonDeleteNonLockupCount(userkey) > 0) {
-				auth = true;
-				userkey = userkeyRepository.queryEntity(userkey);
-			}
-		}
-
-		if (!hasAccount) {
+		if (userkeyRepository.queryNonDeleteNonLockupCount(userkey) == 0) {
 			throw new UnknownAccountException();
 		}
-		if (!auth) {
-			throw new IncorrectCredentialsException();
-		}
+		userkey = userkeyRepository.queryEntity(userkey);
 
 		result = new SimpleAuthenticationInfo(userkey.getUserid(), password, getName());
 

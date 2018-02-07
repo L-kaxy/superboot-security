@@ -10,8 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +21,7 @@ import com.wteam.superboot.core.result.ResultMessage;
 import com.wteam.superboot.security.controller.Param.SecurityParam;
 import com.wteam.superboot.security.entity.po.UserkeyPo;
 import com.wteam.superboot.security.helper.ShiroHelper;
+import com.wteam.superboot.security.service.SystemService;
 
 /**
  * 系統 Controller.
@@ -32,6 +32,9 @@ import com.wteam.superboot.security.helper.ShiroHelper;
 @RestController
 public class SystemController {
 
+	@Autowired
+	private SystemService service;
+
 	/**
 	 * 登录.
 	 * 
@@ -41,18 +44,7 @@ public class SystemController {
 	public ResultMessage login(@RequestBody SecurityParam param, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		UserkeyPo userkeyPo = param.getUserkey().voToPo(UserkeyPo.class);
-
-		ResultMessage resultMessage = null;
-		try {
-			ShiroHelper.login(userkeyPo.getLoginmsg(), userkeyPo.getCredential(), request, response);
-			resultMessage = ResultHelper.result(ResultEnum.LOGIN_SUCCESS);
-		} catch (UnknownAccountException e) {
-			resultMessage = ResultHelper.result(ResultEnum.USERNAME_NOT_EXIST);
-		} catch (IncorrectCredentialsException e) {
-			resultMessage = ResultHelper.result(ResultEnum.PASSWORD_ERROR);
-		}
-
-		return resultMessage;
+		return service.login(userkeyPo, request, response);
 	}
 
 	/**
