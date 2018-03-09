@@ -285,7 +285,9 @@ public class AuthitemService {
 			valid = new AuthitemPo();
 			valid.setAuthitemtype(po.getAuthitemtype());
 			valid.setAuthitemname(po.getAuthitemname());
-			if (authitemRepository.hasNonDeleteEntity(valid)) {
+			
+			AuthitemPo tempValid = authitemRepository.queryEntity(valid);
+			if (tempValid != null && tempValid.getAuthitemid() != po.getAuthitemid()) {
 				sameName.add(po);
 			} else {
 				valid.setAuthitemid(po.getAuthitemid());
@@ -335,7 +337,7 @@ public class AuthitemService {
 			tempVo.poToVo(po);
 			resultList.add(tempVo);
 		}
-
+		
 		parm.put("permissionList", resultList);
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 
@@ -376,7 +378,8 @@ public class AuthitemService {
 			theRole = new AuthitemPo();
 			theRole.setAuthitemtype(false);
 			theRole.setAuthitemname(role.getAuthitemname());
-			if (authitemRepository.queryCount(theRole) != 0L) {
+			AuthitemPo tempRole = authitemRepository.queryEntity(theRole);
+			if (tempRole != null && tempRole.getAuthitemid() != role.getAuthitemid()) {
 				isSameName = true;
 			}
 		}
@@ -424,7 +427,7 @@ public class AuthitemService {
 
 		AuthitemmapPo rolepermission = null;
 		for (AuthitemPo po : list) {
-			
+
 			rolepermission = new AuthitemmapPo();
 			rolepermission.setParentid(po.getAuthitemid());
 			if (authitemmapRepository.hasNonDeleteEntity(rolepermission)) {
@@ -456,7 +459,6 @@ public class AuthitemService {
 		PermissionresourcemapPo permissionresource = null;
 		AuthitemmapPo rolepermission = null;
 		for (AuthitemPo po : list) {
-			
 
 			permissionresource = new PermissionresourcemapPo();
 			permissionresource.setPermissionid(po.getAuthitemid());

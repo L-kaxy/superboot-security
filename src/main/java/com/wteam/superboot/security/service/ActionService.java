@@ -260,7 +260,8 @@ public class ActionService {
 		if (action.getActionname() != null) {
 			theAction = new ActionPo();
 			theAction.setActionname(action.getActionname());
-			if (actionRepository.queryCount(theAction) != 0L) {
+			ActionPo tempAction = actionRepository.queryEntity(theAction);
+			if (tempAction != null && tempAction.getActionid() != action.getActionid()) {
 				isSameName = true;
 			}
 		}
