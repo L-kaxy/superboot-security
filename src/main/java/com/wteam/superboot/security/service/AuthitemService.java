@@ -54,7 +54,7 @@ public class AuthitemService {
 	 * 
 	 * @param pageinfo
 	 *            分页信息，不得为null.
-	 * @param aimPo
+	 * @param authitem
 	 *            权限条目实体精确查询信息，不得为null.
 	 * @param likePo
 	 *            权限条目实体模糊查询信息，不得为null.
@@ -111,7 +111,7 @@ public class AuthitemService {
 	 * @throws Exception
 	 *             异常抛出.
 	 */
-	public ResultMessage pageRole(final PageinfoPo pageinfo, final AuthitemPo authitem) throws Exception {
+	public ResultMessage pageRole(final PageinfoPo pageinfo, final AuthitemPo likePo) throws Exception {
 		if (pageinfo == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
@@ -124,7 +124,7 @@ public class AuthitemService {
 
 		AuthitemPo roleTypeParm = new AuthitemPo();
 		roleTypeParm.setAuthitemtype(false);
-		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, roleTypeParm, authitem);
+		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, roleTypeParm, likePo);
 		// 获取角色对应的行为列表
 		AuthitemPo rPo = null;
 		AuthitemmapPo rpmapPo = null;
@@ -502,7 +502,7 @@ public class AuthitemService {
 	 * @throws Exception
 	 *             异常抛出.
 	 */
-	public ResultMessage pagePermission(final PageinfoPo pageinfo, final AuthitemPo authitem) throws Exception {
+	public ResultMessage pagePermission(final PageinfoPo pageinfo, final AuthitemPo likePo) throws Exception {
 		if (pageinfo == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
@@ -515,7 +515,7 @@ public class AuthitemService {
 
 		AuthitemPo permissionTypeParm = new AuthitemPo();
 		permissionTypeParm.setAuthitemtype(true);
-		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, permissionTypeParm, authitem);
+		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, permissionTypeParm, likePo);
 
 		Map<String, Object> parm = new HashMap<String, Object>();
 		parm.put("pageList", pageResult.getContent());

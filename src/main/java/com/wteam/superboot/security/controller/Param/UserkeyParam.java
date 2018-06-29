@@ -11,7 +11,7 @@ import com.wteam.superboot.security.entity.po.UserkeyPo;
 /**
  * 返回参数.
  * 
- * @authod 罗佳欣
+ * @author 罗佳欣
  * @version 1.2.0
  */
 public class UserkeyParam extends CoreParam {

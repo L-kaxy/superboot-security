@@ -64,8 +64,6 @@ public class SystemController {
 	 * @param response
 	 *            HttpServletResponse.
 	 * @return 结果集.
-	 * @throws Exception
-	 *             异常抛出.
 	 */
 	@PostMapping("/logout")
 	public ResultMessage logout(HttpServletRequest request, HttpServletResponse response) {
@@ -82,8 +80,6 @@ public class SystemController {
 	 * @param response
 	 *            HttpServletResponse.
 	 * @return 结果集.
-	 * @throws Exception
-	 *             异常抛出.
 	 */
 	@PostMapping("/isLogin")
 	public ResultMessage isLogin(HttpServletRequest request, HttpServletResponse response) {
