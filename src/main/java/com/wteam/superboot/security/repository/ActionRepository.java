@@ -11,7 +11,7 @@ import com.wteam.superboot.security.entity.po.ActionPo;
  * 接口 Repository.
  * 
  * @author 罗佳欣
- * @version 1.0.0
+ * @version 1.2.0
  */
 public interface ActionRepository extends SuperRepository<ActionPo, Long> {
 
