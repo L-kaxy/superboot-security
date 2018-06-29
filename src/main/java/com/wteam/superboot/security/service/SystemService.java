@@ -23,6 +23,7 @@ import com.wteam.superboot.security.repository.UserkeyRepository;
  * 二级管理员登录模块Servcie类(单例).
  * 
  * @author 罗佳欣
+ * @version 1.2.0
  */
 @Service
 @Transactional
@@ -37,7 +38,13 @@ public class SystemService {
 	/**
 	 * 密码登录.
 	 * 
-	 * @return
+	 * @param userkey
+	 *            用户验证信息.
+	 * @param request
+	 *            HttpServletRequest
+	 * @param response
+	 *            HttpServletResponse
+	 * @return 结果集.
 	 */
 	public ResultMessage login(final UserkeyPo userkey, final HttpServletRequest request,
 			HttpServletResponse response) {

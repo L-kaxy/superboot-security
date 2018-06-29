@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.service;
@@ -23,38 +23,28 @@ import com.wteam.superboot.core.result.ResultMessage;
 import com.wteam.superboot.security.entity.po.AuthitemPo;
 import com.wteam.superboot.security.entity.po.UserauthitemmapPo;
 import com.wteam.superboot.security.entity.po.UserkeyPo;
-import com.wteam.superboot.security.entity.vo.AuthitemVo;
+import com.wteam.superboot.security.entity.vo.UserkeyListItemVo;
 import com.wteam.superboot.security.repository.AuthitemRepository;
 import com.wteam.superboot.security.repository.UserauthitemmapRepository;
 import com.wteam.superboot.security.repository.UserkeyRepository;
-import com.wteam.superboot.security.view.po.UserkeyListItemPo;
-import com.wteam.superboot.security.view.vo.UserkeyListItemVo;
 
 /**
  * 授权Service类.
  * 
  * @author 罗佳欣
- *
+ * @version 1.2.0
  */
 @Service
 @Transactional
 public class UserkeyService {
 
 	/**
-	 * 注入authitemRepository.
+	 * 注入 Repository.
 	 */
 	@Autowired
 	private AuthitemRepository authitemRepository;
-
-	/**
-	 * 注入userkeyRepository.
-	 */
 	@Autowired
 	private UserkeyRepository userkeyRepository;
-
-	/**
-	 * 注入userauthitemmapRepository.
-	 */
 	@Autowired
 	private UserauthitemmapRepository userauthitemmapRepository;
 
@@ -63,16 +53,14 @@ public class UserkeyService {
 	 * 
 	 * @param pageinfo
 	 *            分页信息，不得为null.
-	 * @param likePo
+	 * @param userkey
 	 *            接口实体模糊查询信息，不得为null.
-	 * @return
+	 * @return 结果集.
 	 * @throws Exception
+	 *             抛出异常.
 	 */
 	public ResultMessage pageUserkey(final PageinfoPo pageinfo, final UserkeyPo userkey) throws Exception {
 		if (pageinfo == null) {
-			throw new SuperException(ResultEnum.PARAM_ERROR);
-		}
-		if (userkey == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (pageinfo.getSortFieldNames() == null) {
@@ -83,17 +71,17 @@ public class UserkeyService {
 		}
 
 		Page<UserkeyPo> pageResult = userkeyRepository.pageNonDeleteEntity(pageinfo, new UserkeyPo(), userkey);
-		
+
 		// 获取用户对应的角色列表
 		UserkeyPo uPo = null;
 		UserauthitemmapPo uamapPo = null;
 		AuthitemPo aPo = null;
-		UserkeyListItemPo uItemPo = null;
+		UserkeyListItemVo uItemPo = null;
 		List<AuthitemPo> roleList = null;
-		List<UserkeyListItemPo> itemPoList = new ArrayList<UserkeyListItemPo>();
+		List<UserkeyListItemVo> itemVoList = new ArrayList<>();
 		for (SuperPersistentObject po : pageResult.getContent()) {
 			uPo = (UserkeyPo) po;
-			uItemPo = new UserkeyListItemPo();
+			uItemPo = new UserkeyListItemVo();
 			uItemPo.setUserid(uPo.getUserid());
 			uItemPo.setUserkeyid(uPo.getUserkeyid());
 			uItemPo.setLoginmsg(uPo.getLoginmsg());
@@ -107,20 +95,11 @@ public class UserkeyService {
 				roleList.add(aPo);
 			}
 			uItemPo.setRoleList(roleList);
-			itemPoList.add(uItemPo);
+			itemVoList.add(uItemPo);
 		}
 
 		Map<String, Object> parm = new HashMap<String, Object>();
-
-		List<UserkeyListItemVo> resultList = new ArrayList<UserkeyListItemVo>();
-		UserkeyListItemVo tempVo = null;
-		for (UserkeyListItemPo po : itemPoList) {
-			tempVo = new UserkeyListItemVo();
-			tempVo.poViewToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("pageList", resultList);
+		parm.put("pageList", itemVoList);
 		parm.put("totalCount", pageResult.getTotalElements());
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 
@@ -130,8 +109,11 @@ public class UserkeyService {
 	/**
 	 * 获取指定用户所属角色.
 	 * 
-	 * @return
+	 * @param userkey
+	 *            用户验证信息实体.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             抛出异常.
 	 */
 	public ResultMessage getUserRoleList(final UserkeyPo userkey) throws Exception {
 		if (userkey == null) {
@@ -150,18 +132,9 @@ public class UserkeyService {
 		}
 
 		Map<String, Object> parm = new HashMap<String, Object>();
-
-		List<AuthitemVo> resultList = new ArrayList<AuthitemVo>();
-		AuthitemVo tempVo = null;
-		for (AuthitemPo po : roleList) {
-			tempVo = new AuthitemVo();
-			tempVo.poToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("roleList", resultList);
+		parm.put("roleList", roleList);
+		
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
-
 		return rs;
 	}
 

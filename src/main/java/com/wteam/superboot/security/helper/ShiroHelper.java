@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2015 Wteamfly.  All rights reserved. 网飞公司 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.helper;
@@ -35,17 +35,22 @@ import com.wteam.superboot.core.entity.po.SystemconfigPo;
 import com.wteam.superboot.core.repository.SystemconfigRepository;
 
 /**
- * shiro权限认证工具类.
+ * shiro 权限认证工具类.
  * 
+ * @author 罗佳欣
+ * @version 1.2.0
  */
 @Component
 public class ShiroHelper implements ApplicationContextAware {
 
+	/**
+	 * 系统配置 Repository.
+	 */
 	@Autowired
 	private SystemconfigRepository repository;
 
 	/**
-	 * Spring 应用上下文环境
+	 * Spring 应用上下文环境.
 	 */
 	private ApplicationContext applicationContext;
 
@@ -57,16 +62,6 @@ public class ShiroHelper implements ApplicationContextAware {
 	/**
 	 * 初始化Shiro数据源.
 	 */
-	static {
-	}
-
-	/**
-	 * shiro权限认证工具类的私有构造方法，其作用是为了防止用户显式生成工具类的实例对象.
-	 * 
-	 */
-	public ShiroHelper() {
-	}
-
 	@PostConstruct
 	public void init() {
 
@@ -106,7 +101,7 @@ public class ShiroHelper implements ApplicationContextAware {
 	 *            ServletRequest
 	 * @param response
 	 *            ServletResponse
-	 * @return 当前用户
+	 * @return 当前用户.
 	 */
 	public static Subject getSubject(final ServletRequest request, final ServletResponse response) {
 		ServletRequest toUseRequest = request;
@@ -197,6 +192,12 @@ public class ShiroHelper implements ApplicationContextAware {
 		return result;
 	}
 
+	/**
+	 * 设置 applicationContext 的值.
+	 * 
+	 * @param applicationContext
+	 *            赋值给 applicationContext.
+	 */
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;

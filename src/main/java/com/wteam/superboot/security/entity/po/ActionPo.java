@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 Wteamfly.  All rights reserved. 网飞公司 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.entity.po;
@@ -18,56 +18,59 @@ import com.wteam.superboot.core.entity.po.BasePersistentObject;
 /**
  * 接口持久层类.
  * 
+ * @author 罗佳欣
+ * @version 1.2.0
  */
 @Entity
 @Table(name = "t_action")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class ActionPo extends BasePersistentObject {
 
-    /**
-     * 接口编号.
-     */
+	/**
+	 * 接口编号.
+	 */
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long actionid;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long actionid;
 
-    /**
-     * 接口名.
-     */
+	/**
+	 * 接口名.
+	 */
 	@Column(nullable = false)
-    private String actionname;
+	private String actionname;
 
-    /**
-     * @return 获取的actionid
-     */
-    public Long getActionid() {
-        return actionid;
-    }
+	/**
+	 * @return 设置 actionid 的值.
+	 */
+	public Long getActionid() {
+		return actionid;
+	}
 
-    /**
-     * 设置actionid的方法.
-     * 
-     * @param actionid
-     *            赋值给actionid的值
-     */
-    public void setActionid(Long actionid) {
-        this.actionid = actionid;
-    }
+	/**
+	 * 设置 actionid 的值.
+	 * 
+	 * @param actionid
+	 *            赋值给 actionid.
+	 */
+	public void setActionid(Long actionid) {
+		this.actionid = actionid;
+	}
 
-    /**
-     * @return 获取的actionname
-     */
-    public String getActionname() {
-        return actionname;
-    }
+	/**
+	 * @return 设置 actionname 的值.
+	 */
+	public String getActionname() {
+		return actionname;
+	}
 
-    /**
-     * 设置actionname的方法.
-     * 
-     * @param actionname
-     *            赋值给actionname的值
-     */
-    public void setActionname(String actionname) {
-        this.actionname = actionname;
-    }
+	/**
+	 * 设置 actionname 的值.
+	 * 
+	 * @param actionname
+	 *            赋值给 actionname.
+	 */
+	public void setActionname(String actionname) {
+		this.actionname = actionname;
+	}
+
 }

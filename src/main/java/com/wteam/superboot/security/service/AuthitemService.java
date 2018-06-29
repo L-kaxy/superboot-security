@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.service;
@@ -24,38 +24,28 @@ import com.wteam.superboot.core.result.ResultMessage;
 import com.wteam.superboot.security.entity.po.AuthitemPo;
 import com.wteam.superboot.security.entity.po.AuthitemmapPo;
 import com.wteam.superboot.security.entity.po.PermissionresourcemapPo;
-import com.wteam.superboot.security.entity.vo.AuthitemVo;
+import com.wteam.superboot.security.entity.vo.RoleListItemVo;
 import com.wteam.superboot.security.repository.AuthitemRepository;
 import com.wteam.superboot.security.repository.AuthitemmapRepository;
 import com.wteam.superboot.security.repository.PermissionresourcemapRepository;
-import com.wteam.superboot.security.view.po.RoleListItemPo;
-import com.wteam.superboot.security.view.vo.RoleListItemVo;
 
 /**
  * 权限条目Service类.
  * 
  * @author 罗佳欣
- *
+ * @version 1.2.0
  */
 @Service
 @Transactional
 public class AuthitemService {
 
 	/**
-	 * 注入authitemRepository.
+	 * 注入 Repository.
 	 */
 	@Autowired
 	private AuthitemRepository authitemRepository;
-
-	/**
-	 * 注入authitemRepository.
-	 */
 	@Autowired
 	private AuthitemmapRepository authitemmapRepository;
-
-	/**
-	 * 注入permissionresourcemapRepository.
-	 */
 	@Autowired
 	private PermissionresourcemapRepository permissionresourcemapRepository;
 
@@ -68,15 +58,13 @@ public class AuthitemService {
 	 *            权限条目实体精确查询信息，不得为null.
 	 * @param likePo
 	 *            权限条目实体模糊查询信息，不得为null.
-	 * @return
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
-	public ResultMessage pageAuthitem(final PageinfoPo pageinfo, final AuthitemPo aimPo, final AuthitemPo likePo)
+	public ResultMessage pageAuthitem(final PageinfoPo pageinfo, final AuthitemPo authitem, final AuthitemPo likePo)
 			throws Exception {
 		if (pageinfo == null) {
-			throw new SuperException(ResultEnum.PARAM_ERROR);
-		}
-		if (aimPo == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (pageinfo.getSortFieldNames() == null) {
@@ -86,16 +74,16 @@ public class AuthitemService {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 
-		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, aimPo, likePo);
-		Map<String, Object> parm = new HashMap<String, Object>();
+		AuthitemPo aimPo = (authitem == null ? new AuthitemPo() : authitem);
 
-		List<AuthitemVo> resultList = new ArrayList<AuthitemVo>();
-		AuthitemVo tempVo = null;
+		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, aimPo, likePo);
+
+		List<AuthitemPo> resultList = new ArrayList<>();
+		AuthitemPo tempPo = null;
 		for (SuperPersistentObject po : pageResult.getContent()) {
-			tempVo = new AuthitemVo();
-			tempVo.poToVo(po);
-			if (!"系统".equals(tempVo.getAuthitemname())) {
-				resultList.add(tempVo);
+			tempPo = (AuthitemPo) po;
+			if (!"系统".equals(tempPo.getAuthitemname())) {
+				resultList.add(tempPo);
 			}
 		}
 
@@ -104,10 +92,11 @@ public class AuthitemService {
 			minus = 1;
 		}
 
+		Map<String, Object> parm = new HashMap<>();
 		parm.put("pageList", resultList);
 		parm.put("totalCount", pageResult.getTotalElements() - minus);
-		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 
+		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 		return rs;
 	}
 
@@ -118,14 +107,12 @@ public class AuthitemService {
 	 *            分页信息，不得为null.
 	 * @param likePo
 	 *            接口实体模糊查询信息，不得为null.
-	 * @return
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
-	public ResultMessage pageRole(final PageinfoPo pageinfo, final AuthitemPo likePo) throws Exception {
+	public ResultMessage pageRole(final PageinfoPo pageinfo, final AuthitemPo authitem) throws Exception {
 		if (pageinfo == null) {
-			throw new SuperException(ResultEnum.PARAM_ERROR);
-		}
-		if (likePo == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (pageinfo.getSortFieldNames() == null) {
@@ -137,17 +124,17 @@ public class AuthitemService {
 
 		AuthitemPo roleTypeParm = new AuthitemPo();
 		roleTypeParm.setAuthitemtype(false);
-		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, roleTypeParm, likePo);
+		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, roleTypeParm, authitem);
 		// 获取角色对应的行为列表
 		AuthitemPo rPo = null;
 		AuthitemmapPo rpmapPo = null;
 		AuthitemPo pPo = null;
-		RoleListItemPo rItemPo = null;
+		RoleListItemVo rItemPo = null;
 		List<AuthitemPo> permissionList = null;
-		List<RoleListItemPo> itemPoList = new ArrayList<RoleListItemPo>();
+		List<RoleListItemVo> itemVoList = new ArrayList<>();
 		for (SuperPersistentObject po : pageResult.getContent()) {
 			rPo = (AuthitemPo) po;
-			rItemPo = new RoleListItemPo();
+			rItemPo = new RoleListItemVo();
 			rItemPo.setRoleid(rPo.getAuthitemid());
 			rItemPo.setAuthitemname(rPo.getAuthitemname());
 			rItemPo.setAuthitemtype(rPo.getAuthitemtype());
@@ -161,31 +148,29 @@ public class AuthitemService {
 				permissionList.add(pPo);
 			}
 			rItemPo.setPermissionList(permissionList);
-			itemPoList.add(rItemPo);
+			itemVoList.add(rItemPo);
 		}
 
 		Map<String, Object> parm = new HashMap<String, Object>();
-
-		List<RoleListItemVo> resultList = new ArrayList<RoleListItemVo>();
-		RoleListItemVo tempVo = null;
-		for (RoleListItemPo po : itemPoList) {
-			tempVo = new RoleListItemVo();
-			tempVo.poViewToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("pageList", resultList);
+		parm.put("pageList", itemVoList);
 		parm.put("totalCount", pageResult.getTotalElements());
-		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 
+		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 		return rs;
 	}
 
 	/**
 	 * 添加角色.
 	 * 
-	 * @return
+	 * @param role
+	 *            角色实体.
+	 * @param permissions
+	 *            权限列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage addRole(final AuthitemPo role, final List<AuthitemPo> permissions, final UserPo currentUser)
 			throws Exception {
@@ -226,8 +211,13 @@ public class AuthitemService {
 	/**
 	 * 批量添加权限条目.
 	 * 
-	 * @return
+	 * @param list
+	 *            权限列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage addAuthitemByList(final List<AuthitemPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -266,8 +256,13 @@ public class AuthitemService {
 	/**
 	 * 批量编辑权限条目.
 	 * 
-	 * @return
+	 * @param list
+	 *            权限列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage editAuthitemByList(final List<AuthitemPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -285,7 +280,7 @@ public class AuthitemService {
 			valid = new AuthitemPo();
 			valid.setAuthitemtype(po.getAuthitemtype());
 			valid.setAuthitemname(po.getAuthitemname());
-			
+
 			AuthitemPo tempValid = authitemRepository.queryEntity(valid);
 			if (tempValid != null && tempValid.getAuthitemid() != po.getAuthitemid()) {
 				sameName.add(po);
@@ -309,8 +304,11 @@ public class AuthitemService {
 	/**
 	 * 获取指定角色所属行为.
 	 * 
-	 * @return
+	 * @param theRole
+	 *            角色实体.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage getRolePermissionList(final AuthitemPo theRole) throws Exception {
 		if (theRole == null) {
@@ -329,26 +327,26 @@ public class AuthitemService {
 		}
 
 		Map<String, Object> parm = new HashMap<String, Object>();
+		parm.put("permissionList", permissionList);
 
-		List<AuthitemVo> resultList = new ArrayList<AuthitemVo>();
-		AuthitemVo tempVo = null;
-		for (AuthitemPo po : permissionList) {
-			tempVo = new AuthitemVo();
-			tempVo.poToVo(po);
-			resultList.add(tempVo);
-		}
-		
-		parm.put("permissionList", resultList);
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
-
 		return rs;
 	}
 
 	/**
 	 * 编辑角色.
 	 * 
-	 * @return
+	 * @param role
+	 *            角色实体.
+	 * @param addPermissions
+	 *            添加权限列表.
+	 * @param subPermissions
+	 *            删除权限列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage editRole(final AuthitemPo role, final List<AuthitemPo> addPermissions,
 			final List<AuthitemPo> subPermissions, final UserPo currentUser) throws Exception {
@@ -414,8 +412,13 @@ public class AuthitemService {
 	/**
 	 * 批量删除角色.
 	 * 
-	 * @return
+	 * @param list
+	 *            要删除的角色列表.
+	 * @param currentUser
+	 *            当期用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage deleteRoleByList(final List<AuthitemPo> list, final UserPo currentUser) throws Exception {
 		if (list == null) {
@@ -444,8 +447,13 @@ public class AuthitemService {
 	/**
 	 * 批量删除行为.
 	 * 
-	 * @return
+	 * @param list
+	 *            要删除的行为列表.
+	 * @param currentUser
+	 *            当期用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage deletePermissionByList(final List<AuthitemPo> list, final UserPo currentUser)
 			throws Exception {
@@ -486,14 +494,16 @@ public class AuthitemService {
 	/**
 	 * 行为分页.
 	 * 
-	 * @return
+	 * @param pageinfo
+	 *            分页信息.
+	 * @param likePo
+	 *            模糊查询对象.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
-	public ResultMessage pagePermission(final PageinfoPo pageinfo, final AuthitemPo likePo) throws Exception {
+	public ResultMessage pagePermission(final PageinfoPo pageinfo, final AuthitemPo authitem) throws Exception {
 		if (pageinfo == null) {
-			throw new SuperException(ResultEnum.PARAM_ERROR);
-		}
-		if (likePo == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 		if (pageinfo.getSortFieldNames() == null) {
@@ -505,22 +515,13 @@ public class AuthitemService {
 
 		AuthitemPo permissionTypeParm = new AuthitemPo();
 		permissionTypeParm.setAuthitemtype(true);
-		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, permissionTypeParm, likePo);
+		Page<AuthitemPo> pageResult = authitemRepository.pageNonDeleteEntity(pageinfo, permissionTypeParm, authitem);
 
 		Map<String, Object> parm = new HashMap<String, Object>();
-
-		List<AuthitemVo> resultList = new ArrayList<AuthitemVo>();
-		AuthitemVo tempVo = null;
-		for (SuperPersistentObject po : pageResult.getContent()) {
-			tempVo = new AuthitemVo();
-			tempVo.poToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("pageList", resultList);
+		parm.put("pageList", pageResult.getContent());
 		parm.put("totalCount", pageResult.getTotalElements());
-		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 
+		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 		return rs;
 	}
 

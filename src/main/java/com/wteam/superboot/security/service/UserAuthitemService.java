@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.service;
@@ -22,14 +22,14 @@ import com.wteam.superboot.security.repository.UserauthitemmapRepository;
  * 用户权限条目Servcie类.
  * 
  * @author 罗佳欣
- *
+ * @version 1.2.0
  */
 @Service
 @Transactional
 public class UserAuthitemService {
 
 	/**
-	 * 注入userauthitemmapRepository.
+	 * 注入 Repository.
 	 */
 	@Autowired
 	private UserauthitemmapRepository userauthitemmapRepository;
@@ -37,8 +37,13 @@ public class UserAuthitemService {
 	/**
 	 * 批量添加用户权限条目映射.
 	 * 
-	 * @return
+	 * @param list
+	 *            用户权限列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             抛出异常.
 	 */
 	public ResultMessage addUserAuthitemByList(final List<UserauthitemmapPo> list, final UserPo currentUser)
 			throws Exception {
@@ -68,8 +73,13 @@ public class UserAuthitemService {
 	/**
 	 * 批量删除用户权限条目映射.
 	 * 
-	 * @return
+	 * @param list
+	 *            用户权限列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             抛出异常.
 	 */
 	public ResultMessage deleteUserAuthitemByList(final List<UserauthitemmapPo> list, final UserPo currentUser)
 			throws Exception {

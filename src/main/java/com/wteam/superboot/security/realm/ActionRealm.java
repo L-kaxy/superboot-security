@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 Wteamfly.  All rights reserved. 网飞公司 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.realm;
@@ -36,39 +36,36 @@ import com.wteam.superboot.security.repository.UserauthitemmapRepository;
 import com.wteam.superboot.security.repository.UserkeyRepository;
 
 /**
- * 接口Realm类.
+ * 接口 Realm 类.
  * 
+ * @author 罗佳欣
+ * @version 1.2.0
  */
 @Component
 public class ActionRealm extends AuthorizingRealm {
 
+	/**
+	 * 注入 Repository.
+	 */
 	@Autowired
 	private UserkeyRepository userkeyRepository;
-
 	@Autowired
 	private ResourcetypeRepository resourcetypeRepository;
-
 	@Autowired
 	private UserauthitemmapRepository userauthitemmapRepository;
-
 	@Autowired
 	private AuthitemRepository authitemRepository;
-
 	@Autowired
 	private AuthitemmapRepository authitemmapRepository;
-
 	@Autowired
 	private PermissionresourcemapRepository permissionresourcemapRepository;
-
 	@Autowired
 	private ResourceRepository resourceRepository;
-
 	@Autowired
 	private ActionRepository actionRepository;
 
 	/**
 	 * 初始化接口Realm.
-	 * 
 	 */
 	public ActionRealm() {
 		// 这个名字必须匹配那个在用户类的getPrincipals()方法中的名字
@@ -141,7 +138,8 @@ public class ActionRealm extends AuthorizingRealm {
 		for (AuthitemPo permissionTemp : permissionSet) {
 			permissionresource = new PermissionresourcemapPo();
 			permissionresource.setPermissionid(permissionTemp.getAuthitemid());
-			for (PermissionresourcemapPo po : permissionresourcemapRepository.queryNonDeleteNonLockupList(permissionresource)) {
+			for (PermissionresourcemapPo po : permissionresourcemapRepository
+					.queryNonDeleteNonLockupList(permissionresource)) {
 				resource = resourceRepository.getEntityById(ResourcePo.class, po.getResourceid());
 				if (resource.getResourcetypeid() == type.getResourcetypeid()) {
 					action = actionRepository.getEntityById(ActionPo.class, resource.getRealid());

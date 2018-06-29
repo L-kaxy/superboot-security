@@ -1,10 +1,8 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.controller;
-
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,49 +12,80 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wteam.superboot.core.entity.po.UserPo;
 import com.wteam.superboot.core.enums.ResultEnum;
-import com.wteam.superboot.core.helper.JsonHelper;
 import com.wteam.superboot.core.helper.ResultHelper;
 import com.wteam.superboot.core.result.ResultMessage;
-import com.wteam.superboot.security.controller.Param.SecurityParam;
+import com.wteam.superboot.security.controller.Param.AuthitemParam;
 import com.wteam.superboot.security.entity.po.AuthitemPo;
 import com.wteam.superboot.security.service.AuthitemService;
 
 /**
  * 权限Controller.
  * 
- * @authod 罗佳欣
- * 
+ * @author 罗佳欣
+ * @version 1.2.0
  */
 @RestController
 public class AuthitemController {
 
+	/**
+	 * 注入 service.
+	 */
 	@Autowired
 	private AuthitemService service;
 
+	/**
+	 * 批量添加权限条目.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/addAuthitemByList")
-	public ResultMessage addAuthitemByList(@RequestBody SecurityParam param,
+	public ResultMessage addAuthitemByList(@RequestBody AuthitemParam param,
 			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
-		List<AuthitemPo> list = JsonHelper.jsonToBeanList(param.getAuthitemList(), AuthitemPo.class);
-		return service.addAuthitemByList(list, currentUser);
+		return service.addAuthitemByList(param.getAuthitemList(), currentUser);
 	}
 
+	/**
+	 * 批量编辑权限条目.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/editAuthitemByList")
-	public ResultMessage editAuthitemByList(@RequestBody SecurityParam param,
+	public ResultMessage editAuthitemByList(@RequestBody AuthitemParam param,
 			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
-		List<AuthitemPo> list = JsonHelper.jsonToBeanList(param.getAuthitemList(), AuthitemPo.class);
-		return service.editAuthitemByList(list, currentUser);
+		return service.editAuthitemByList(param.getAuthitemList(), currentUser);
 	}
 
+	/**
+	 * 接口分页附对应行为列表.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/deleteAuthitemByList")
-	public ResultMessage deleteAuthitemByList(@RequestBody SecurityParam param,
+	public ResultMessage deleteAuthitemByList(@RequestBody AuthitemParam param,
 			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
 		ResultMessage resultMessage = null;
 
-		List<AuthitemPo> list = JsonHelper.jsonToBeanList(param.getAuthitemList(), AuthitemPo.class);
-
 		boolean hasPermission = false;
 		boolean hasRole = false;
-		for (AuthitemPo po : list) {
+		for (AuthitemPo po : param.getAuthitemList()) {
 			if (!hasPermission && po.getAuthitemtype()) {
 				hasPermission = true;
 			}
@@ -69,69 +98,103 @@ public class AuthitemController {
 			resultMessage = ResultHelper.result(ResultEnum.PARAM_ERROR);
 		} else {
 			if (hasPermission) {
-				resultMessage = service.deletePermissionByList(list, currentUser);
+				resultMessage = service.deletePermissionByList(param.getAuthitemList(), currentUser);
 			} else if (hasRole) {
-				resultMessage = service.deleteRoleByList(list, currentUser);
+				resultMessage = service.deleteRoleByList(param.getAuthitemList(), currentUser);
 			}
 		}
 
 		return resultMessage;
 	}
 
+	/**
+	 * 查询非删除权限条目分页列表.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/pageAuthitem")
-	public ResultMessage pageAuthitem(@RequestBody SecurityParam param) throws Exception {
-		AuthitemPo aimPo = param.getAuthitem().voToPo(AuthitemPo.class);
-		if (aimPo == null) {
-			aimPo = new AuthitemPo();
-		}
-		AuthitemPo likePo = param.getAuthitem2().voToPo(AuthitemPo.class);
-		if (likePo == null) {
-			likePo = new AuthitemPo();
-		}
-		return service.pageAuthitem(param.getPageinfo(), aimPo, likePo);
+	public ResultMessage pageAuthitem(@RequestBody AuthitemParam param) throws Exception {
+		return service.pageAuthitem(param.getPageinfo(), param.getAuthitem(), param.getAuthitem2());
 	}
 
+	/**
+	 * 行为分页.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/pagePermission")
-	public ResultMessage pagePermission(@RequestBody SecurityParam param) throws Exception {
-		AuthitemPo likePo = param.getAuthitem().voToPo(AuthitemPo.class);
-		if (likePo == null) {
-			likePo = new AuthitemPo();
-		}
-		return service.pagePermission(param.getPageinfo(), likePo);
+	public ResultMessage pagePermission(@RequestBody AuthitemParam param) throws Exception {
+		return service.pagePermission(param.getPageinfo(), param.getAuthitem());
 	}
 
+	/**
+	 * 角色分页附对应行为列表.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/pageRole")
-	public ResultMessage pageRole(@RequestBody SecurityParam param) throws Exception {
-		AuthitemPo likePo = param.getAuthitem().voToPo(AuthitemPo.class);
-		if (likePo == null) {
-			likePo = new AuthitemPo();
-		}
-		return service.pageRole(param.getPageinfo(), likePo);
+	public ResultMessage pageRole(@RequestBody AuthitemParam param) throws Exception {
+		return service.pageRole(param.getPageinfo(), param.getAuthitem());
 	}
 
+	/**
+	 * 添加角色.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/addRole")
-	public ResultMessage addRole(@RequestBody SecurityParam param, @RequestAttribute("currentUser") UserPo currentUser)
+	public ResultMessage addRole(@RequestBody AuthitemParam param, @RequestAttribute("currentUser") UserPo currentUser)
 			throws Exception {
-		AuthitemPo role = param.getAuthitem().voToPo(AuthitemPo.class);
-		List<AuthitemPo> permissionPos = JsonHelper.jsonToBeanList(param.getAuthitemList(), AuthitemPo.class);
-
-		return service.addRole(role, permissionPos, currentUser);
+		return service.addRole(param.getAuthitem(), param.getAuthitemList(), currentUser);
 	}
 
+	/**
+	 * 获取指定角色所属行为.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/getRolePermissionList")
-	public ResultMessage getRolePermissionList(@RequestBody SecurityParam param) throws Exception {
-		AuthitemPo role = param.getAuthitem().voToPo(AuthitemPo.class);
-		return service.getRolePermissionList(role);
+	public ResultMessage getRolePermissionList(@RequestBody AuthitemParam param) throws Exception {
+		return service.getRolePermissionList(param.getAuthitem());
 	}
 
+	/**
+	 * 编辑角色.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/editRole")
-	public ResultMessage editRole(@RequestBody SecurityParam param, @RequestAttribute("currentUser") UserPo currentUser)
+	public ResultMessage editRole(@RequestBody AuthitemParam param, @RequestAttribute("currentUser") UserPo currentUser)
 			throws Exception {
-		AuthitemPo role = param.getAuthitem().voToPo(AuthitemPo.class);
-		List<AuthitemPo> addPermissionPos = JsonHelper.jsonToBeanList(param.getAuthitemList(), AuthitemPo.class);
-		List<AuthitemPo> subPermissionPos = JsonHelper.jsonToBeanList(param.getAuthitemList2(), AuthitemPo.class);
-
-		return service.editRole(role, addPermissionPos, subPermissionPos, currentUser);
+		return service.editRole(param.getAuthitem(), param.getAuthitemList(), param.getAuthitemList2(), currentUser);
 	}
 
 }

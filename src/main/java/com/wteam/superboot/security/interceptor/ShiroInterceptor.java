@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
+ * 请勿修改或删除版权声明及文件头部.
+ */
 package com.wteam.superboot.security.interceptor;
 
 import java.io.PrintWriter;
@@ -31,26 +35,39 @@ import com.wteam.superboot.security.repository.ResourcetypeRepository;
  * shiro 拦截器.
  * 
  * @author 罗佳欣
- *
+ * @version 1.2.0
  */
 @Component
 public class ShiroInterceptor implements HandlerInterceptor {
 
+	/**
+	 * 注入 Repository.
+	 */
 	@Autowired
 	private ResourcetypeRepository resourcetypeRepository;
-
 	@Autowired
 	private ActionRepository actionRepository;
-
 	@Autowired
 	private ResourceRepository resourceRepository;
-
 	@Autowired
 	private PermissionresourcemapRepository permissionresourcemapRepository;
-
 	@Autowired
 	private UserRepository userRepository;
-	
+
+	/**
+	 * 执行请求前.
+	 * 
+	 * @param request
+	 *            ServletRequest.
+	 * @param response
+	 *            ServletResponse.
+	 * @param handler
+	 *            执行的控制方法.
+	 * @throws Exception
+	 *             抛出异常.
+	 * 
+	 * @return 是否继续执行.
+	 */
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
@@ -132,11 +149,39 @@ public class ShiroInterceptor implements HandlerInterceptor {
 		return keepOn;
 	}
 
+	/**
+	 * 执行请求后.
+	 * 
+	 * @param request
+	 *            ServletRequest.
+	 * @param response
+	 *            ServletResponse.
+	 * @param handler
+	 *            执行的控制方法.
+	 * @param modelAndView
+	 *            模型或视图.
+	 * @throws Exception
+	 *             抛出异常.
+	 */
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
 	}
 
+	/**
+	 * 请求完成.
+	 * 
+	 * @param request
+	 *            ServletRequest.
+	 * @param response
+	 *            ServletResponse.
+	 * @param handler
+	 *            执行的控制方法.
+	 * @param ex
+	 *            异常.
+	 * @throws Exception
+	 *             抛出异常.
+	 */
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {

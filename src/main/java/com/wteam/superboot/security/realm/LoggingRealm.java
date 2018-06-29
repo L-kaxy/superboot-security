@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 Wteamfly.  All rights reserved. 网飞公司 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.realm;
@@ -29,33 +29,32 @@ import com.wteam.superboot.security.repository.ResourcetypeRepository;
 import com.wteam.superboot.security.repository.UserkeyRepository;
 
 /**
- * 登录后Realm类.
+ * 登录后 Realm 类.
  * 
+ * @author 罗佳欣
+ * @version 1.2.0
  */
 @Component
 public class LoggingRealm extends AuthorizingRealm {
 
+	/**
+	 * 注入 Repository.
+	 */
 	@Autowired
 	private UserkeyRepository userkeyRepository;
-
 	@Autowired
 	private ResourcetypeRepository resourcetypeRepository;
-
 	@Autowired
 	private AuthitemRepository authitemRepository;
-
 	@Autowired
 	private PermissionresourcemapRepository permissionresourcemapRepository;
-
 	@Autowired
 	private ResourceRepository resourceRepository;
-
 	@Autowired
 	private ActionRepository actionRepository;
 
 	/**
 	 * 初始化登录后Realm.
-	 * 
 	 */
 	public LoggingRealm() {
 		// 这个名字必须匹配那个在用户类的getPrincipals()方法中的名字

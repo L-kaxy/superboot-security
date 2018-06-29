@@ -1,10 +1,8 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.controller;
-
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,59 +11,103 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wteam.superboot.core.entity.po.UserPo;
-import com.wteam.superboot.core.helper.JsonHelper;
 import com.wteam.superboot.core.result.ResultMessage;
-import com.wteam.superboot.security.controller.Param.SecurityParam;
-import com.wteam.superboot.security.entity.po.ActionPo;
-import com.wteam.superboot.security.entity.po.AuthitemPo;
+import com.wteam.superboot.security.controller.Param.ActionParam;
 import com.wteam.superboot.security.service.ActionService;
 
 /**
  * 接口Controller.
  * 
- * @authod 罗佳欣
- * 
+ * @author 罗佳欣
+ * @version 1.2.0
  */
 @RestController
 public class ActionController {
 
+	/**
+	 * 注入 service.
+	 */
 	@Autowired
 	private ActionService service;
 
+	/**
+	 * 接口分页附对应行为列表.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/pageAction")
-	public ResultMessage pageAction(@RequestBody SecurityParam param) throws Exception {
-		ActionPo likePo = param.getAction().voToPo(ActionPo.class);
-		return service.pageAction(param.getPageinfo(), likePo);
+	public ResultMessage pageAction(@RequestBody ActionParam param) throws Exception {
+		return service.pageAction(param.getPageinfo(), param.getAction());
 	}
 
+	/**
+	 * 添加接口.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/addAction")
-	public ResultMessage addAction(@RequestBody SecurityParam param,
+	public ResultMessage addAction(@RequestBody ActionParam param,
 			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
-		List<AuthitemPo> permissions = JsonHelper.jsonToBeanList(param.getPermissionList(), AuthitemPo.class);
-		ActionPo actionPo = param.getAction().voToPo(ActionPo.class);
-		return service.addAction(actionPo, permissions, currentUser);
+		return service.addAction(param.getAction(), param.getPermissionList(), currentUser);
 	}
 
+	/**
+	 * 获取指定接口所属行为.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/getActionPermissionList")
-	public ResultMessage getActionPermissionList(@RequestBody SecurityParam param) throws Exception {
-		ActionPo actionPo = param.getAction().voToPo(ActionPo.class);
-		return service.getActionPermissionList(actionPo);
+	public ResultMessage getActionPermissionList(@RequestBody ActionParam param) throws Exception {
+		return service.getActionPermissionList(param.getAction());
 	}
 
+	/**
+	 * 编辑接口.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/editAction")
-	public ResultMessage editAction(@RequestBody SecurityParam param,
+	public ResultMessage editAction(@RequestBody ActionParam param,
 			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
-		List<AuthitemPo> addPermissionPos = JsonHelper.jsonToBeanList(param.getPermissionList(), AuthitemPo.class);
-		List<AuthitemPo> subPermissionPos = JsonHelper.jsonToBeanList(param.getPermissionList2(), AuthitemPo.class);
-		ActionPo actionPo = param.getAction().voToPo(ActionPo.class);
-		return service.editAction(actionPo, addPermissionPos, subPermissionPos, currentUser);
+		return service.editAction(param.getAction(), param.getPermissionList(), param.getPermissionList2(),
+				currentUser);
 	}
 
+	/**
+	 * 批量删除接口.
+	 * 
+	 * @param param
+	 *            请求数据.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
+	 * @throws Exception
+	 *             异常抛出.
+	 */
 	@PostMapping("/deleteActionByList")
-	public ResultMessage deleteActionByList(@RequestBody SecurityParam param,
+	public ResultMessage deleteActionByList(@RequestBody ActionParam param,
 			@RequestAttribute("currentUser") UserPo currentUser) throws Exception {
-		List<ActionPo> list = JsonHelper.jsonToBeanList(param.getActionList(), ActionPo.class);
-		return service.deleteActionByList(list, currentUser);
+		return service.deleteActionByList(param.getActionList());
 	}
 
 }

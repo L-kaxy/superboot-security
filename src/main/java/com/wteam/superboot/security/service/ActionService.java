@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007-2017 Wteam.  All rights reserved. 网维网络技术创业团队 版权所有.
+ * Copyright (c) 2017-2018 Tianxin.  All rights reserved. 广州天新网络科技有限公司 版权所有.
  * 请勿修改或删除版权声明及文件头部.
  */
 package com.wteam.superboot.security.service;
@@ -26,52 +26,34 @@ import com.wteam.superboot.security.entity.po.AuthitemPo;
 import com.wteam.superboot.security.entity.po.PermissionresourcemapPo;
 import com.wteam.superboot.security.entity.po.ResourcePo;
 import com.wteam.superboot.security.entity.po.ResourcetypePo;
-import com.wteam.superboot.security.entity.vo.AuthitemVo;
+import com.wteam.superboot.security.entity.vo.ActionListItemVo;
 import com.wteam.superboot.security.repository.ActionRepository;
 import com.wteam.superboot.security.repository.AuthitemRepository;
 import com.wteam.superboot.security.repository.PermissionresourcemapRepository;
 import com.wteam.superboot.security.repository.ResourceRepository;
 import com.wteam.superboot.security.repository.ResourcetypeRepository;
-import com.wteam.superboot.security.view.po.ActionListItemPo;
-import com.wteam.superboot.security.view.vo.ActionListItemVo;
 
 /**
  * 接口Service类.
  * 
  * @author 罗佳欣
- *
+ * @version 1.2.0
  */
 @Service
 @Transactional
 public class ActionService {
 
 	/**
-	 * 注入actionRepository.
+	 * 注入 Repository.
 	 */
 	@Autowired
 	private ActionRepository actionRepository;
-
-	/**
-	 * 注入resourcetypeRepository.
-	 */
 	@Autowired
 	private ResourcetypeRepository resourcetypeRepository;
-
-	/**
-	 * 注入resourceRepository.
-	 */
 	@Autowired
 	private ResourceRepository resourceRepository;
-
-	/**
-	 * 注入authitemRepository.
-	 */
 	@Autowired
 	private AuthitemRepository authitemRepository;
-
-	/**
-	 * 注入permissionresourcemapRepository.
-	 */
 	@Autowired
 	private PermissionresourcemapRepository permissionresourcemapRepository;
 
@@ -82,8 +64,9 @@ public class ActionService {
 	 *            分页信息，不得为null.
 	 * @param likePo
 	 *            接口实体模糊查询信息，不得为null.
-	 * @return
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage pageAction(final PageinfoPo pageinfo, final ActionPo likePo) throws Exception {
 		if (pageinfo == null) {
@@ -105,15 +88,15 @@ public class ActionService {
 		ResourcePo resource = null;
 		PermissionresourcemapPo prmapPo = null;
 		AuthitemPo pPo = null;
-		ActionListItemPo aItemPo = null;
+		ActionListItemVo aItemVo = null;
 		List<AuthitemPo> permissionList = null;
-		List<ActionListItemPo> itemPoList = new ArrayList<ActionListItemPo>();
+		List<ActionListItemVo> itemVoList = new ArrayList<>();
 		for (SuperPersistentObject po : pageResult.getContent()) {
 			aPo = (ActionPo) po;
-			aItemPo = new ActionListItemPo();
-			aItemPo.setActionid(aPo.getActionid());
-			aItemPo.setActionname(aPo.getActionname());
-			aItemPo.setCreatetime(aPo.getCreatetime());
+			aItemVo = new ActionListItemVo();
+			aItemVo.setActionid(aPo.getActionid());
+			aItemVo.setActionname(aPo.getActionname());
+			aItemVo.setCreatetime(aPo.getCreatetime());
 
 			resource = new ResourcePo();
 			resource.setResourcetypeid(actionType.getResourcetypeid());
@@ -122,37 +105,35 @@ public class ActionService {
 
 			prmapPo = new PermissionresourcemapPo();
 			prmapPo.setResourceid(resource.getResourceid());
-			permissionList = new ArrayList<AuthitemPo>();
+			permissionList = new ArrayList<>();
 			for (PermissionresourcemapPo tampPmapPo : permissionresourcemapRepository.queryNonDeleteList(prmapPo)) {
 				pPo = authitemRepository.getEntityById(AuthitemPo.class, tampPmapPo.getPermissionid());
 				permissionList.add(pPo);
 			}
-			aItemPo.setPermissionList(permissionList);
-			itemPoList.add(aItemPo);
+			aItemVo.setPermissionList(permissionList);
+			itemVoList.add(aItemVo);
 		}
 
-		Map<String, Object> parm = new HashMap<String, Object>();
-
-		List<ActionListItemVo> resultList = new ArrayList<ActionListItemVo>();
-		ActionListItemVo tempVo = null;
-		for (ActionListItemPo po : itemPoList) {
-			tempVo = new ActionListItemVo();
-			tempVo.poViewToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("pageList", resultList);
+		Map<String, Object> parm = new HashMap<>();
+		parm.put("pageList", itemVoList);
 		parm.put("totalCount", pageResult.getTotalElements());
-		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 
+		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
 		return rs;
 	}
 
 	/**
 	 * 添加接口.
 	 * 
-	 * @return
+	 * @param action
+	 *            接口实体.
+	 * @param permissions
+	 *            权限列表.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage addAction(final ActionPo action, final List<AuthitemPo> permissions, final UserPo currentUser)
 			throws Exception {
@@ -195,8 +176,11 @@ public class ActionService {
 	/**
 	 * 获取指定接口所属行为.
 	 * 
-	 * @return
+	 * @param action
+	 *            接口实体.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage getActionPermissionList(final ActionPo action) throws Exception {
 		if (action == null) {
@@ -222,26 +206,26 @@ public class ActionService {
 		}
 
 		Map<String, Object> parm = new HashMap<String, Object>();
+		parm.put("permissionList", permissionList);
 
-		List<AuthitemVo> resultList = new ArrayList<AuthitemVo>();
-		AuthitemVo tempVo = null;
-		for (AuthitemPo po : permissionList) {
-			tempVo = new AuthitemVo();
-			tempVo.poToVo(po);
-			resultList.add(tempVo);
-		}
-
-		parm.put("permissionList", resultList);
 		ResultMessage rs = ResultHelper.result(ResultEnum.GET_SUCCESS, parm);
-
 		return rs;
 	}
 
 	/**
 	 * 编辑接口.
 	 * 
-	 * @return
+	 * @param action
+	 *            接口实体.
+	 * @param addPermissions
+	 *            添加的权限.
+	 * @param subPermissions
+	 *            删除的权限.
+	 * @param currentUser
+	 *            当前用户.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
 	public ResultMessage editAction(final ActionPo action, final List<AuthitemPo> addPermissions,
 			final List<AuthitemPo> subPermissions, final UserPo currentUser) throws Exception {
@@ -304,14 +288,14 @@ public class ActionService {
 	/**
 	 * 批量删除接口.
 	 * 
-	 * @return
+	 * @param list
+	 *            要删除的接口实体列表.
+	 * @return 结果集.
 	 * @throws Exception
+	 *             异常抛出.
 	 */
-	public ResultMessage deleteActionByList(final List<ActionPo> list, final UserPo currentUser) throws Exception {
+	public ResultMessage deleteActionByList(final List<ActionPo> list) throws Exception {
 		if (list == null) {
-			throw new SuperException(ResultEnum.PARAM_ERROR);
-		}
-		if (currentUser == null) {
 			throw new SuperException(ResultEnum.PARAM_ERROR);
 		}
 
@@ -322,13 +306,13 @@ public class ActionService {
 		ResourcePo resource = null;
 		PermissionresourcemapPo map = null;
 		for (ActionPo po : list) {
-			
+
 			resource = new ResourcePo();
 			resource.setRealid(po.getActionid());
 			resource.setResourcetypeid(type.getResourcetypeid());
 			if (resourceRepository.hasNonDeleteEntity(resource)) {
 				resource = resourceRepository.queryEntity(resource);
-				
+
 				map = new PermissionresourcemapPo();
 				map.setResourceid(resource.getResourceid());
 
